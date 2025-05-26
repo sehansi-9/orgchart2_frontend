@@ -33,7 +33,7 @@ const DepartmentPopover = ({ anchorEl, isOpen, onClose, entity }) => {
       <Typography>
         Map:
       </Typography>
-      <iframe src={entity?.map || "NA"}> </iframe>
+      <iframe width="300" height="500" src={entity?.map || "NA"}> </iframe>
 
     </Popover>
   );
