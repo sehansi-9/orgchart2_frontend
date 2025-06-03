@@ -10,32 +10,78 @@ import {
 import { Box, TextField, Button, Typography } from '@mui/material';
 
 const dummyData = [
-  { year: 2020, ministry: 'Ministry of Health', department: 'Department of Elderly Care' },
-  { year: 2021, ministry: 'Ministry of Welfare', department: 'Department of Elderly Care' },
-  { year: 2023, ministry: 'Ministry of Social Affairs', department: 'Department of Elderly Care' },
+  {
+    department: 'Geological Survey and Mines Bureau',
+    movements: [
+      { year: 2010, ministry: 'Ministry of Environment' },
+      { year: 2013, ministry: 'Ministry of Environment & Renewable Energy' },
+      { year: 2015, ministry: 'Ministry of Mahaweli Development & Environment' },
+      { year: 2018, ministry: 'Ministry of Mahaweli Development & Environment' },
+      { year: 2019, ministry: 'Ministry of Environment and Wildlife Resources' },
+      { year: 2020, ministry: 'Ministry of Environment' },
+    ],
+  },
+  {
+    department: 'Department of Child Services',
+    movements: [
+      { year: 2020, ministry: 'Ministry of Welfare' },
+      { year: 2022, ministry: 'Ministry of Family Development' },
+    ],
+  },
 ];
 
-const ministryPositions = {
-  'Ministry of Health': 3,
-  'Ministry of Welfare': 2,
-  'Ministry of Social Affairs': 1,
+const getMinistryPositions = (movements) => {
+  const ministryEarliestYear = {};
+
+  // Track the earliest year per ministry
+  movements.forEach((m) => {
+    if (
+      !ministryEarliestYear[m.ministry] ||
+      m.year < ministryEarliestYear[m.ministry]
+    ) {
+      ministryEarliestYear[m.ministry] = m.year;
+    }
+  });
+
+  const sorted = Object.entries(ministryEarliestYear)
+    .sort((a, b) => a[1] - b[1]); // Sort by earliest year (ASC)
+
+  // Assign max position to earliest year (inverted)
+  const maxPosition = sorted.length;
+
+  return sorted.reduce((acc, [ministry], index) => {
+    acc[ministry] = maxPosition - index; // Invert index to give highest position to earliest
+    return acc;
+  }, {});
 };
+
 
 const DepartmentTimeline = () => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [filteredData, setFilteredData] = useState([]);
+  const [filteredMovements, setFilteredMovements] = useState([]);
+  const [ministryPositions, setMinistryPositions] = useState({});
+  const [department, setDepartment] = useState("");
 
   const handleSearch = () => {
-    const filtered = dummyData.filter(
-      (item) => item.department.toLowerCase().includes(searchTerm.toLowerCase())
+    const matched = dummyData.find((item) =>
+      item.department.toLowerCase().includes(searchTerm.toLowerCase())
     );
-    setFilteredData(filtered);
+    if (matched) {
+      setFilteredMovements(matched.movements);
+      setMinistryPositions(getMinistryPositions(matched.movements));
+      setDepartment(matched.department);
+    } else {
+      setFilteredMovements([]);
+      setMinistryPositions({});
+      setDepartment("No department found");
+    }
   };
 
-  const chartData = filteredData.map((item) => ({
-    year: item.year,
-    position: ministryPositions[item.ministry],
-    ministry: item.ministry,
+
+  const chartData = filteredMovements.map((m) => ({
+    year: m.year,
+    ministry: m.ministry,
+    position: ministryPositions[m.ministry],
   }));
 
   return (
@@ -43,50 +89,57 @@ const DepartmentTimeline = () => {
       sx={{
         height: '90vh',
         width: '90vw',
-        backgroundColor: '#1e1e1e',
+        backgroundColor: '#121212',
         color: 'white',
         display: 'flex',
         flexDirection: 'column',
-        padding: 3,
+        padding: 4,
+        fontFamily: 'Roboto, sans-serif',
       }}
     >
-      <Typography variant="h5" gutterBottom>
+      <Typography variant="h4" sx={{ mb: 3, fontWeight: 600 }}>
         Department Movement Timeline
       </Typography>
 
-      <Box sx={{ mb: 2, display: 'flex', gap: 2 }}>
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 4 }}>
+
         <TextField
           label="Search Department"
           variant="outlined"
           size="small"
+          fullWidth
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           sx={{
+            input: { color: 'white' },
+            label: { color: 'rgba(255,255,255,0.6)' },
             '& .MuiOutlinedInput-root': {
-              color: 'white',
               '& fieldset': {
-                borderColor: 'rgba(255, 255, 255, 0.23)',
+                borderColor: 'rgba(255,255,255,0.2)',
               },
               '&:hover fieldset': {
-                borderColor: 'rgba(255, 255, 255, 0.5)',
+                borderColor: 'rgba(255,255,255,0.4)',
               },
               '&.Mui-focused fieldset': {
                 borderColor: 'white',
               },
             },
-            '& .MuiInputLabel-root': {
-              color: 'rgba(255, 255, 255, 0.7)',
-            },
           }}
         />
+
+
         <Button
           variant="contained"
           onClick={handleSearch}
           sx={{
-            backgroundColor: 'white',
-            color: 'black',
+            minWidth: 120,
+            height: '40px',
+            fontWeight: 600,
+            backgroundColor: '#ffffff',
+            color: '#000',
+            textTransform: 'none',
             '&:hover': {
-              backgroundColor: 'rgba(255, 255, 255, 0.9)',
+              backgroundColor: '#e0e0e0',
             },
           }}
         >
@@ -94,26 +147,34 @@ const DepartmentTimeline = () => {
         </Button>
       </Box>
 
-      <Box sx={{ flexGrow: 1 }}>
-        {filteredData.length > 0 ? (
+      {department && (
+        <Typography variant="h6" sx={{ mb: 2, color: '#90caf9' }}>
+          Department: {department}
+        </Typography>
+      )}
+
+      <Box sx={{ flexGrow: 1, backgroundColor: '#1e1e1e', borderRadius: 2, p: 2 }}>
+        {filteredMovements.length > 0 ? (
           <ResponsiveContainer width="100%" height="100%">
             <LineChart
               data={chartData}
-              margin={{ top: 20, right: 30, left: 80, bottom: 20 }}
+              margin={{ top: 20, right: 30, left: 100, bottom: 20 }}
             >
               <XAxis
                 dataKey="year"
-                type="number"
-                domain={[2020, 2024]}
+                type="category"
+                ticks={filteredMovements.map((m) => m.year)}
                 tickCount={5}
                 label={{ value: 'Year', position: 'top', fill: 'white' }}
                 orientation="top"
+                padding={{ left: 20, right: 20 }}
                 stroke="white"
-                tick={{ fill: 'white' }}
+                tick={{ fill: 'white', fontSize: 13 }}
               />
               <YAxis
                 type="number"
-                domain={[0, 4]}
+                domain={[1, Object.keys(ministryPositions).length + 1]}
+                ticks={Object.values(ministryPositions)}
                 tickFormatter={(value) => {
                   const ministry = Object.entries(ministryPositions).find(
                     ([_, pos]) => pos === value
@@ -128,8 +189,9 @@ const DepartmentTimeline = () => {
                   fill: 'white',
                 }}
                 stroke="white"
-                tick={{ fill: 'white' }}
+                tick={{ fill: 'white', fontSize: 13 }}
               />
+
               <Tooltip
                 formatter={(value, name, props) => [
                   props.payload.ministry,
@@ -137,18 +199,20 @@ const DepartmentTimeline = () => {
                 ]}
                 labelFormatter={(label) => `Year: ${label}`}
                 contentStyle={{
-                  backgroundColor: '#1e1e1e',
-                  border: '1px solid rgba(255, 255, 255, 0.23)',
+                  backgroundColor: '#2c2c2c',
+                  border: '1px solid rgba(255, 255, 255, 0.3)',
+                  borderRadius: 6,
                   color: 'white',
+                  fontSize: 13,
                 }}
               />
               <Line
                 type="monotone"
                 dataKey="position"
-                stroke="white"
-                strokeWidth={2}
-                dot={{ r: 6, fill: 'white' }}
-                activeDot={{ r: 8, fill: 'white' }}
+                stroke="#90caf9"
+                strokeWidth={3}
+                dot={{ r: 6, fill: '#90caf9' }}
+                activeDot={{ r: 8, fill: '#ffca28' }}
               />
             </LineChart>
           </ResponsiveContainer>
@@ -156,9 +220,9 @@ const DepartmentTimeline = () => {
           <Typography
             variant="body1"
             align="center"
-            sx={{ color: 'rgba(255, 255, 255, 0.7)', mt: 4 }}
+            sx={{ color: 'rgba(255, 255, 255, 0.6)', mt: 4 }}
           >
-            Search for a department to see its timeline
+            🔍 Search for a department to see its movement over time.
           </Typography>
         )}
       </Box>
