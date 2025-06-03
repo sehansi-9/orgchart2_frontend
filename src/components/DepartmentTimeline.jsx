@@ -44,7 +44,6 @@ const dummyData = [
 const getMinistryPositions = (movements) => {
   const ministryEarliestYear = {};
 
-  // Track the earliest year per ministry
   movements.forEach((m) => {
     if (
       !ministryEarliestYear[m.ministry] ||
@@ -164,80 +163,118 @@ const DepartmentTimeline = () => {
         </Typography>
       )}
 
-      <Box sx={{ flexGrow: 1, backgroundColor: '#1e1e1e', borderRadius: 2, p: 2 }}>
-        {filteredMovements.length > 0 ? (
-          <ResponsiveContainer width="100%" height="100%">
-            <LineChart
-              data={chartData}
-              margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
-            >
-              <XAxis
-                dataKey="year"
-                type="category"
-                ticks={filteredMovements.map((m) => m.year)}
-                tickCount={5}
-                label={{ value: 'Year', position: 'top', fill: 'white' }}
-                orientation="top"
-                padding={{ left: 20, right: 20 }}
-                stroke="white"
-                tick={{ fill: 'white', fontSize: 13 }}
-              />
-              <YAxis
-                type="number"
-                domain={[1, Object.keys(ministryPositions).length + 1]}
-                ticks={Object.values(ministryPositions)}
-                 width={200}
-                tickFormatter={(value) => {
-                  const ministry = Object.entries(ministryPositions).find(
-                    ([_, pos]) => pos === value
-                  )?.[0];
-                  return ministry || '';
-                }}
-                label={{
-                  value: 'Ministry',
-                  angle: -90,
-                  position: 'left',
-                  offset: 6,
-                  fill: 'white',
-                }}
-                stroke="white"
-                tick={{ fill: 'white', fontSize: 13 }}
-              />
+   <Box
+  sx={{
+    flexGrow: 1,
+    backgroundColor: '#1e1e1e',
+    borderRadius: 2,
+    p: 2,
+    display: 'flex',
+    alignItems: 'stretch',
+    height: Math.max(200, 100 * Object.keys(ministryPositions).length) + 40,
+  }}
+>
+  {/* Fixed Y axis */}
+  <Box
+    sx={{
+      flexShrink: 0,
+      width: 200,
+      height: '100%',
+    }}
+  >
+    <ResponsiveContainer width="100%" height="100%">
+      <LineChart
+        data={chartData}
+        margin={{ top: 50, right: 0, left: 0, bottom: 40 }}
+      >
+        <YAxis
+          type="number"
+          domain={[1, Object.keys(ministryPositions).length + 1]}
+          ticks={Object.values(ministryPositions)}
+          tickFormatter={(value) => {
+            const ministry = Object.entries(ministryPositions).find(
+              ([_, pos]) => pos === value
+            )?.[0];
+            return ministry || '';
+          }}
+          label={{
+            value: 'Ministry',
+            angle: -90,
+            position: 'insideLeft',
+            offset: 6,
+            fill: 'white',
+          }}
+          stroke="white"
+          tick={{ fill: 'white', fontSize: 13 }}
+          width={200}
+        />
+      </LineChart>
+    </ResponsiveContainer>
+  </Box>
 
-              <Tooltip
-                formatter={(value, name, props) => [
-                  props.payload.ministry,
-                  'Ministry',
-                ]}
-                labelFormatter={(label) => `Year: ${label}`}
-                contentStyle={{
-                  backgroundColor: '#2c2c2c',
-                  border: '1px solid rgba(255, 255, 255, 0.3)',
-                  borderRadius: 6,
-                  color: 'white',
-                  fontSize: 13,
-                }}
-              />
-              <Line
-                type="monotone"
-                dataKey="position"
-                stroke="#90caf9"
-                strokeWidth={3}
-                dot={{ r: 6, fill: '#90caf9' }}
-                activeDot={{ r: 8, fill: '#ffca28' }}
-              />
-            </LineChart>
-          </ResponsiveContainer>
-        ) : (
-          <Typography
-            variant="body1"
-            align="center"
-            sx={{ color: 'rgba(255, 255, 255, 0.6)', mt: 4 }}
-          >
-            🔍 Search for a department to see its movement over time.
-          </Typography>
-        )}
-      </Box>
+  {/* Scrollable chart: X axis + line + hidden Y axis */}
+  <Box
+    sx={{
+      overflowX: 'auto',
+      overflowY: 'hidden',
+      flexGrow: 1,
+      height: '100%',
+    }}
+  >
+    <div style={{ minWidth: filteredMovements.length * 80, height: '100%' }}>
+      <ResponsiveContainer width="100%" height="100%">
+        <LineChart
+          data={chartData}
+          margin={{ top: 20, right: 30, left: 0, bottom: 20 }}
+        >
+          <XAxis
+            dataKey="year"
+            type="category"
+            ticks={filteredMovements.map((m) => m.year)}
+            tickCount={5}
+            label={{ value: 'Year', position: 'top', fill: 'white' }}
+            orientation="top"
+            padding={{ left: 20, right: 20 }}
+            stroke="white"
+            tick={{ fill: 'white', fontSize: 13 }}
+          />
+
+          {/* Hidden Y axis with exact same domain and ticks */}
+          <YAxis
+            type="number"
+            domain={[1, Object.keys(ministryPositions).length + 1]}
+            ticks={Object.values(ministryPositions)}
+            hide={true} // Hide so it doesn't show again but needed for scaling
+          />
+
+          <Tooltip
+            formatter={(value, name, props) => [
+              props.payload.ministry,
+              'Ministry',
+            ]}
+            labelFormatter={(label) => `Year: ${label}`}
+            contentStyle={{
+              backgroundColor: '#2c2c2c',
+              border: '1px solid rgba(255, 255, 255, 0.3)',
+              borderRadius: 6,
+              color: 'white',
+              fontSize: 13,
+            }}
+          />
+          <Line
+            type="monotone"
+            dataKey="position"
+            stroke="#90caf9"
+            strokeWidth={3}
+            dot={{ r: 6, fill: '#90caf9' }}
+            activeDot={{ r: 8, fill: '#ffca28' }}
+          />
+        </LineChart>
+      </ResponsiveContainer>
+    </div>
+  </Box>
+</Box>
+
     </Box>
   );
 };
