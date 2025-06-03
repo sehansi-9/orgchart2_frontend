@@ -17,15 +17,26 @@ const dummyData = [
       { year: 2013, ministry: 'Ministry of Environment & Renewable Energy' },
       { year: 2015, ministry: 'Ministry of Mahaweli Development & Environment' },
       { year: 2018, ministry: 'Ministry of Mahaweli Development & Environment' },
-      { year: 2019, ministry: 'Ministry of Environment and Wildlife Resources' },
+      { year: 2019, ministry: 'Minister of Environment and Wildlife Resources' },
       { year: 2020, ministry: 'Ministry of Environment' },
     ],
   },
   {
-    department: 'Department of Child Services',
+    department: 'National Oceanic Affairs Committee Secretariat',
     movements: [
-      { year: 2020, ministry: 'Ministry of Welfare' },
-      { year: 2022, ministry: 'Ministry of Family Development' },
+      { year: 2015, ministry: 'Ministry of Foreign Affairs' },
+      { year: 2019, ministry: 'Ministry of Foreign Relations' },
+      { year: 2020, ministry: 'Foreign Ministry' },
+      { year: 2022, ministry: 'Ministry of Foreign Affairs' },
+    ],
+  },
+  {
+    department: 'Tax Appeals Commission',
+    movements: [
+      { year: 2015, ministry: 'Ministry of Finance' },
+      { year: 2017, ministry: 'Ministry of Finance and Mass Media' },
+      { year: 2018, ministry: 'Ministry of Finance and Mass Media' },
+      { year: 2022, ministry: 'Minister of finance, Economic Stabilization and National Policies' },
     ],
   },
 ];
@@ -158,7 +169,7 @@ const DepartmentTimeline = () => {
           <ResponsiveContainer width="100%" height="100%">
             <LineChart
               data={chartData}
-              margin={{ top: 20, right: 30, left: 100, bottom: 20 }}
+              margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
             >
               <XAxis
                 dataKey="year"
@@ -175,6 +186,7 @@ const DepartmentTimeline = () => {
                 type="number"
                 domain={[1, Object.keys(ministryPositions).length + 1]}
                 ticks={Object.values(ministryPositions)}
+                 width={200}
                 tickFormatter={(value) => {
                   const ministry = Object.entries(ministryPositions).find(
                     ([_, pos]) => pos === value
@@ -185,7 +197,7 @@ const DepartmentTimeline = () => {
                   value: 'Ministry',
                   angle: -90,
                   position: 'left',
-                  offset: 60,
+                  offset: 6,
                   fill: 'white',
                 }}
                 stroke="white"
