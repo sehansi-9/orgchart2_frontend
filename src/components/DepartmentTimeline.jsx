@@ -162,7 +162,7 @@ const DepartmentTimeline = () => {
           Department: {department}
         </Typography>
       )}
-
+{filteredMovements.length > 0 && (
    <Box
   sx={{
     flexGrow: 1,
@@ -274,7 +274,7 @@ const DepartmentTimeline = () => {
     </div>
   </Box>
 </Box>
-
+)}
     </Box>
   );
 };
