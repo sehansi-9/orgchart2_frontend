@@ -162,70 +162,25 @@ const DepartmentTimeline = () => {
           Department: {department}
         </Typography>
       )}
-{filteredMovements.length > 0 && (
-   <Box
+
+     <Box
   sx={{
     flexGrow: 1,
     backgroundColor: '#1e1e1e',
     borderRadius: 2,
     p: 2,
-    display: 'flex',
-    alignItems: 'stretch',
-    height: Math.max(200, 100 * Object.keys(ministryPositions).length) + 40,
+    overflowX: 'auto',  // Enable horizontal scroll here
   }}
 >
-  {/* Fixed Y axis */}
-  <Box
-    sx={{
-      flexShrink: 0,
-      width: 200,
-      height: '100%',
-    }}
-  >
-    <ResponsiveContainer width="100%" height="100%">
-      <LineChart
-        data={chartData}
-        margin={{ top: 50, right: 0, left: 0, bottom: 40 }}
+  {filteredMovements.length > 0 ? (
+    <div style={{ minWidth: filteredMovements.length * 80 }}> {/* Fixed width depending on points */}
+      <ResponsiveContainer
+        width="100%"
+        height={Math.max(200, 100 * Object.keys(ministryPositions).length)}
       >
-        <YAxis
-          type="number"
-          domain={[1, Object.keys(ministryPositions).length + 1]}
-          ticks={Object.values(ministryPositions)}
-          tickFormatter={(value) => {
-            const ministry = Object.entries(ministryPositions).find(
-              ([_, pos]) => pos === value
-            )?.[0];
-            return ministry || '';
-          }}
-          label={{
-            value: 'Ministry',
-            angle: -90,
-            position: 'insideLeft',
-            offset: 6,
-            fill: 'white',
-          }}
-          stroke="white"
-          tick={{ fill: 'white', fontSize: 13 }}
-          width={200}
-        />
-      </LineChart>
-    </ResponsiveContainer>
-  </Box>
-
-  {/* Scrollable chart: X axis + line + hidden Y axis */}
-  <Box
-    sx={{
-      overflowX: 'auto',
-      overflowY: 'hidden',
-      flexGrow: 1,
-      height: '100%',
-    }}
-  >
-    <div style={{ minWidth: filteredMovements.length * 80, height: '100%' }}>
-      <ResponsiveContainer width="100%" height="100%">
         <LineChart
           data={chartData}
-          margin={{ top: 20, right: 30, left: 0, bottom: 20 }}
+          margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
         >
           <XAxis
             dataKey="year"
@@ -238,15 +193,27 @@ const DepartmentTimeline = () => {
             stroke="white"
             tick={{ fill: 'white', fontSize: 13 }}
           />
-
-          {/* Hidden Y axis with exact same domain and ticks */}
           <YAxis
             type="number"
             domain={[1, Object.keys(ministryPositions).length + 1]}
             ticks={Object.values(ministryPositions)}
-            hide={true} // Hide so it doesn't show again but needed for scaling
+            width={200}
+            tickFormatter={(value) => {
+              const ministry = Object.entries(ministryPositions).find(
+                ([_, pos]) => pos === value
+              )?.[0];
+              return ministry || '';
+            }}
+            label={{
+              value: 'Ministry',
+              angle: -90,
+              position: 'left',
+              offset: 6,
+              fill: 'white',
+            }}
+            stroke="white"
+            tick={{ fill: 'white', fontSize: 13 }}
           />
-
           <Tooltip
             formatter={(value, name, props) => [
               props.payload.ministry,
@@ -272,9 +239,16 @@ const DepartmentTimeline = () => {
         </LineChart>
       </ResponsiveContainer>
     </div>
-  </Box>
+  ) : (
+    <Typography
+      variant="body1"
+      align="center"
+      sx={{ color: 'rgba(255, 255, 255, 0.6)', mt: 4 }}
+    >
+      🔍 Search for a department to see its movement over time.
+    </Typography>
+  )}
 </Box>
-)}
     </Box>
   );
 };
