@@ -177,6 +177,16 @@ const PresidentView = () => {
         >
           <div className="tab-header">
             <h3 className="tab-title">{selectedPresidency.name}</h3>
+               {comparisonTabs.length === 0 && ( // add button only if there are no comparison tabs
+            <div className="add-comparison-container">
+              <button 
+                onClick={() => handleAddComparison(selectedPresidency, -1)}
+                className="add-comparison-button"
+              >
+                Add Comparison
+              </button>
+            </div>
+          )}
             <button 
               onClick={() => {
                 if (comparisonTabs.length > 0) {
@@ -199,16 +209,7 @@ const PresidentView = () => {
             </div>
           </div>
 
-          {comparisonTabs.length === 0 && ( // add button only if there are no comparison tabs
-            <div className="add-comparison-container">
-              <button 
-                onClick={() => handleAddComparison(selectedPresidency, -1)}
-                className="add-comparison-button"
-              >
-                Add Comparison
-              </button>
-            </div>
-          )}
+       
         </div>
       )}
 
@@ -224,6 +225,16 @@ const PresidentView = () => {
         >
           <div className="tab-header">
             <h3 className="tab-title">{presidency.name}</h3>
+              {canAddMoreComparisons && ( // add button only if there are less than 3 overall tabs
+            <div className="add-comparison-container">
+              <button 
+                onClick={() => handleAddComparison(presidency, index)}
+                className="add-comparison-button"
+              >
+                Add Comparison
+              </button>
+            </div>
+          )}
             <button 
               onClick={() => removeComparisonTab(index)}
               className="close-button"
@@ -238,16 +249,7 @@ const PresidentView = () => {
             </div>
           </div>
 
-          {canAddMoreComparisons && ( // add button only if there are less than 3 overall tabs
-            <div className="add-comparison-container">
-              <button 
-                onClick={() => handleAddComparison(presidency, index)}
-                className="add-comparison-button"
-              >
-                Add Comparison
-              </button>
-            </div>
-          )}
+        
         </div>
       ))}
 

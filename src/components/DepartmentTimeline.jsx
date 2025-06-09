@@ -64,162 +64,201 @@ const DepartmentTimeline = () => {
   }));
 
   return (
+  <Box
+    sx={{
+      minHeight: '100vh',
+      width: '90vw',
+      backgroundColor: '#121212',
+      color: 'white',
+      display: 'flex',
+      flexDirection: 'column',
+      padding: 4,
+      fontFamily: 'Roboto, sans-serif',
+    }}
+  >
+    <Typography variant="h4" sx={{ mb: 3, fontWeight: 600 }}>
+      Department Tracker
+    </Typography>
+
+    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 4 }}>
+      <TextField
+        label="Search Department"
+        variant="outlined"
+        size="small"
+        fullWidth
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+        sx={{
+          input: { color: 'white' },
+          label: { color: 'rgba(255,255,255,0.6)' },
+          '& .MuiOutlinedInput-root': {
+            '& fieldset': {
+              borderColor: 'rgba(255,255,255,0.2)',
+            },
+            '&:hover fieldset': {
+              borderColor: 'rgba(255,255,255,0.4)',
+            },
+            '&.Mui-focused fieldset': {
+              borderColor: 'white',
+            },
+          },
+        }}
+      />
+
+      <Button
+        variant="contained"
+        onClick={handleSearch}
+        sx={{
+          minWidth: 120,
+          height: '40px',
+          fontWeight: 600,
+          backgroundColor: '#ffffff',
+          color: '#000',
+          textTransform: 'none',
+          '&:hover': {
+            backgroundColor: '#e0e0e0',
+          },
+        }}
+      >
+        Search
+      </Button>
+    </Box>
+
+    {department && (
+      <Typography variant="h6" sx={{ mb: 2, color: '#90caf9' }}>
+        Department: {department}
+      </Typography>
+    )}
+
+    {/* Timeline Chart Section */}
     <Box
       sx={{
-        height: '90vh',
-        width: '90vw',
-        backgroundColor: '#121212',
-        color: 'white',
-        display: 'flex',
-        flexDirection: 'column',
-        padding: 4,
-        fontFamily: 'Roboto, sans-serif',
+        flexGrow: 1,
+        backgroundColor: '#1e1e1e',
+        borderRadius: 2,
+        p: 2,
+        overflowX: 'auto',
+        mb: 4,
       }}
     >
-      <Typography variant="h4" sx={{ mb: 3, fontWeight: 600 }}>
-        Department Movement Timeline
-      </Typography>
-
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 4 }}>
-
-        <TextField
-          label="Search Department"
-          variant="outlined"
-          size="small"
-          fullWidth
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          sx={{
-            input: { color: 'white' },
-            label: { color: 'rgba(255,255,255,0.6)' },
-            '& .MuiOutlinedInput-root': {
-              '& fieldset': {
-                borderColor: 'rgba(255,255,255,0.2)',
-              },
-              '&:hover fieldset': {
-                borderColor: 'rgba(255,255,255,0.4)',
-              },
-              '&.Mui-focused fieldset': {
-                borderColor: 'white',
-              },
-            },
-          }}
-        />
-
-
-        <Button
-          variant="contained"
-          onClick={handleSearch}
-          sx={{
-            minWidth: 120,
-            height: '40px',
-            fontWeight: 600,
-            backgroundColor: '#ffffff',
-            color: '#000',
-            textTransform: 'none',
-            '&:hover': {
-              backgroundColor: '#e0e0e0',
-            },
-          }}
+      {filteredMovements.length > 0 ? (
+        <div style={{ minWidth: filteredMovements.length * 80 }}>
+          <ResponsiveContainer
+            width="100%"
+            height={Math.max(200, 100 * Object.keys(ministryPositions).length)}
+          >
+            <LineChart
+              data={chartData}
+              margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
+            >
+              <XAxis
+                dataKey="year"
+                type="category"
+                ticks={filteredMovements.map((m) => m.year)}
+                tickCount={5}
+                label={{ value: 'Year', position: 'top', fill: 'white' }}
+                orientation="top"
+                padding={{ left: 20, right: 20 }}
+                stroke="white"
+                tick={{ fill: 'white', fontSize: 13 }}
+              />
+              <YAxis
+                type="number"
+                domain={[1, Object.keys(ministryPositions).length + 1]}
+                ticks={Object.values(ministryPositions)}
+                width={200}
+                tickFormatter={(value) => {
+                  const ministry = Object.entries(ministryPositions).find(
+                    ([_, pos]) => pos === value
+                  )?.[0];
+                  return ministry || '';
+                }}
+                label={{
+                  value: 'Minister',
+                  angle: -90,
+                  position: 'left',
+                  offset: 6,
+                  fill: 'white',
+                }}
+                stroke="white"
+                tick={{ fill: 'white', fontSize: 13 }}
+              />
+              <Tooltip
+                formatter={(value, name, props) => [
+                  props.payload.ministry,
+                  'Ministry',
+                ]}
+                labelFormatter={(label) => `Year: ${label}`}
+                contentStyle={{
+                  backgroundColor: '#2c2c2c',
+                  border: '1px solid rgba(255, 255, 255, 0.3)',
+                  borderRadius: 6,
+                  color: 'white',
+                  fontSize: 13,
+                }}
+              />
+              <Line
+                type="monotone"
+                dataKey="position"
+                stroke="#90caf9"
+                strokeWidth={3}
+                dot={{ r: 6, fill: '#90caf9' }}
+                activeDot={{ r: 8, fill: '#ffca28' }}
+              />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
+      ) : (
+        <Typography
+          variant="body1"
+          align="center"
+          sx={{ color: 'rgba(255, 255, 255, 0.6)', mt: 4 }}
         >
-          Search
-        </Button>
-      </Box>
-
-      {department && (
-        <Typography variant="h6" sx={{ mb: 2, color: '#90caf9' }}>
-          Department: {department}
+          🔍 Search for a department.
         </Typography>
       )}
-
-     <Box
-  sx={{
-    flexGrow: 1,
-    backgroundColor: '#1e1e1e',
-    borderRadius: 2,
-    p: 2,
-    overflowX: 'auto',  // Enable horizontal scroll here
-  }}
->
-  {filteredMovements.length > 0 ? (
-    <div style={{ minWidth: filteredMovements.length * 80 }}> {/* Fixed width depending on points */}
-      <ResponsiveContainer
-        width="100%"
-        height={Math.max(200, 100 * Object.keys(ministryPositions).length)}
-      >
-        <LineChart
-          data={chartData}
-          margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
-        >
-          <XAxis
-            dataKey="year"
-            type="category"
-            ticks={filteredMovements.map((m) => m.year)}
-            tickCount={5}
-            label={{ value: 'Year', position: 'top', fill: 'white' }}
-            orientation="top"
-            padding={{ left: 20, right: 20 }}
-            stroke="white"
-            tick={{ fill: 'white', fontSize: 13 }}
-          />
-          <YAxis
-            type="number"
-            domain={[1, Object.keys(ministryPositions).length + 1]}
-            ticks={Object.values(ministryPositions)}
-            width={200}
-            tickFormatter={(value) => {
-              const ministry = Object.entries(ministryPositions).find(
-                ([_, pos]) => pos === value
-              )?.[0];
-              return ministry || '';
-            }}
-            label={{
-              value: 'Ministry',
-              angle: -90,
-              position: 'left',
-              offset: 6,
-              fill: 'white',
-            }}
-            stroke="white"
-            tick={{ fill: 'white', fontSize: 13 }}
-          />
-          <Tooltip
-            formatter={(value, name, props) => [
-              props.payload.ministry,
-              'Ministry',
-            ]}
-            labelFormatter={(label) => `Year: ${label}`}
-            contentStyle={{
-              backgroundColor: '#2c2c2c',
-              border: '1px solid rgba(255, 255, 255, 0.3)',
-              borderRadius: 6,
-              color: 'white',
-              fontSize: 13,
-            }}
-          />
-          <Line
-            type="monotone"
-            dataKey="position"
-            stroke="#90caf9"
-            strokeWidth={3}
-            dot={{ r: 6, fill: '#90caf9' }}
-            activeDot={{ r: 8, fill: '#ffca28' }}
-          />
-        </LineChart>
-      </ResponsiveContainer>
-    </div>
-  ) : (
-    <Typography
-      variant="body1"
-      align="center"
-      sx={{ color: 'rgba(255, 255, 255, 0.6)', mt: 4 }}
-    >
-      🔍 Search for a department to see its movement over time.
-    </Typography>
-  )}
-</Box>
     </Box>
-  );
+
+    {/* Separate Map Section */}
+    {department && filteredMovements.length > 0 && (
+      <Box
+        sx={{
+          backgroundColor: '#1e1e1e',
+          borderRadius: 2,
+          p: 2,
+          boxShadow: '0 4px 10px rgba(0,0,0,0.5)',
+        }}
+      >
+        <Typography variant="h6" sx={{ mb: 2, color: '#90caf9' }}>
+          Department Location
+        </Typography>
+        <Box
+          sx={{
+            width: '100%',
+            height: 300,
+            borderRadius: 2,
+            overflow: 'hidden',
+            border: '1px solid rgba(255,255,255,0.1)',
+          }}
+        >
+          <iframe
+            title="Department Location"
+            width="100%"
+            height="100%"
+            style={{ border: 0 }}
+            loading="lazy"
+            allowFullScreen
+            referrerPolicy="no-referrer-when-downgrade"
+            src={`https://www.google.com/maps?q=${encodeURIComponent(
+              departments.find((d) => d.department === department)?.address || ''
+            )}&output=embed`}
+          ></iframe>
+        </Box>
+      </Box>
+    )}
+  </Box>
+);
+
 };
 
 export default DepartmentTimeline;
