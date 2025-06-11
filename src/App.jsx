@@ -41,6 +41,46 @@ const App = () => {
 
   return (
     <BrowserRouter>
+      <div style={{ padding: "20px", backgroundColor: "#1e1e1e", minHeight: "100vh" }}>
+          <Link className="link"
+            to="/" 
+            style={{ 
+              color: "#fff", 
+              marginRight: "20px", 
+              textDecoration: "none",
+              padding: "8px 16px",
+              borderRadius: "4px",
+              backgroundColor: "#333"
+            }}
+          >
+            President
+          </Link>
+          <Link  className="link"
+            to="/tree" 
+            style={{ 
+              color: "#fff", 
+              textDecoration: "none",
+              padding: "8px 16px",
+              borderRadius: "4px",
+              backgroundColor: "#333",
+              marginRight: "20px"
+            }}
+          >
+            Tree View
+          </Link>
+          <Link  className="link"
+            to="/timeline" 
+            style={{ 
+              color: "#fff", 
+              textDecoration: "none",
+              padding: "8px 16px",
+              borderRadius: "4px",
+              backgroundColor: "#333"
+            }}
+          >
+            Department Timeline
+          </Link>
+
         <Routes>
           <Route 
             path="/tree" 
@@ -54,9 +94,8 @@ const App = () => {
           />
           <Route path="/" element={<PresidentView />} />
           <Route path="/timeline" element={<DepartmentTimeline />} />
-         
         </Routes>
-      
+      </div>
     </BrowserRouter>
   );
 };
